@@ -1,21 +1,21 @@
-package glog_test
+package log_test
 
-import "github.com/ncruces/go-gcp/glog"
+import "github.com/apsystole/log"
 
 func ExamplePrint() {
-	glog.Print("Test")
+	log.Print("Test")
 	// Output:
 	// {"message":"Test"}
 }
 
 func ExampleInfof() {
-	glog.Infof("Hello %q!", "Google")
+	log.Infof("Hello %q!", "Google")
 	// Output:
 	// {"message":"Hello \"Google\"!","severity":"INFO"}
 }
 
 func ExampleWarningj() {
-	glog.Warningj("Warning", map[string]string{"component": "app"})
+	log.Warningj("Warning", map[string]string{"component": "app"})
 	// Output:
 	// {"component":"app","message":"Warning","severity":"WARNING"}
 }

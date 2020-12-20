@@ -1,6 +1,6 @@
-// Package glog implements structured logging for Google App Engine, Cloud Run
+// Package log implements structured logging for Google App Engine, Cloud Run
 // and Cloud Functions.
-package glog
+package log
 
 import (
 	"encoding/json"
