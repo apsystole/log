@@ -8,10 +8,10 @@ func ExamplePrint() {
 	// {"message":"Test","severity":"INFO"}
 }
 
-func ExampleInfof() {
-	log.Infof("Hello %q!", "Google")
+func ExampleNoticef() {
+	log.Noticef("Hello %q!", "Google")
 	// Output:
-	// {"message":"Hello \"Google\"!","severity":"INFO"}
+	// {"message":"Hello \"Google\"!","severity":"NOTICE"}
 }
 
 func ExampleWarningj() {
