@@ -5,7 +5,7 @@ import "github.com/apsystole/log"
 func ExamplePrint() {
 	log.Print("Test")
 	// Output:
-	// {"message":"Test"}
+	// {"message":"Test","severity":"INFO"}
 }
 
 func ExampleInfof() {

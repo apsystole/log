@@ -251,25 +251,25 @@ func ForRequest(r *http.Request) (l Logger) {
 // Print logs an entry with no assigned severity level.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Print(v ...interface{}) {
-	log(defaultsv, l, v...)
+	log(infosv, l, v...)
 }
 
 // Println logs an entry with no assigned severity level.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Println(v ...interface{}) {
-	logln(defaultsv, l, v...)
+	logln(infosv, l, v...)
 }
 
 // Printf logs an entry with no assigned severity level.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Printf(format string, v ...interface{}) {
-	logf(defaultsv, l, format, v...)
+	logf(infosv, l, format, v...)
 }
 
 // Printj logs an entry with no assigned severity level.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Printj(msg string, v interface{}) {
-	logj(defaultsv, l, msg, v)
+	logj(infosv, l, msg, v)
 }
 
 // Debug logs debug or trace information.
