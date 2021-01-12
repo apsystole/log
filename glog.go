@@ -1,5 +1,5 @@
 // Package log implements structured logging for Google App Engine, Cloud Run
-// and Cloud Functions.
+// and Cloud Functions. The API is compatible with the standard library "log" module.
 package log
 
 import (
@@ -15,49 +15,49 @@ var std Logger
 // ProjectID should be set to the Google Cloud project ID.
 var ProjectID string = os.Getenv("GOOGLE_CLOUD_PROJECT")
 
-// Print logs an entry with no assigned severity level.
+// Print logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Print.
 func Print(v ...interface{}) {
 	std.Print(v...)
 }
 
-// Println logs an entry with no assigned severity level.
+// Println logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Println.
 func Println(v ...interface{}) {
 	std.Println(v...)
 }
 
-// Printf logs an entry with no assigned severity level.
+// Printf logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Printf.
 func Printf(format string, v ...interface{}) {
 	std.Printf(format, v...)
 }
 
-// Printj logs an entry with no assigned severity level.
+// Printj logs routine information, such as ongoing status or performance.
 // Arguments become jsonPayload in the log entry.
 func Printj(msg string, v interface{}) {
 	std.Printj(msg, v)
 }
 
-// Debug logs debug or trace information.
+// Debug logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Print.
 func Debug(v ...interface{}) {
 	std.Debug(v...)
 }
 
-// Debugln logs debug or trace information.
+// Debugln logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Println.
 func Debugln(v ...interface{}) {
 	std.Debugln(v...)
 }
 
-// Debugf logs debug or trace information.
+// Debugf logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Printf.
 func Debugf(format string, v ...interface{}) {
 	std.Debugf(format, v...)
 }
 
-// Debugj logs debug or trace information.
+// Debugj logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments become jsonPayload in the log entry.
 func Debugj(msg string, v interface{}) {
 	std.Debugj(msg, v)
@@ -248,49 +248,49 @@ func ForRequest(r *http.Request) (l Logger) {
 	return l
 }
 
-// Print logs an entry with no assigned severity level.
+// Print logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Print(v ...interface{}) {
 	log(infosv, l, v...)
 }
 
-// Println logs an entry with no assigned severity level.
+// Println logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Println(v ...interface{}) {
 	logln(infosv, l, v...)
 }
 
-// Printf logs an entry with no assigned severity level.
+// Printf logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Printf(format string, v ...interface{}) {
 	logf(infosv, l, format, v...)
 }
 
-// Printj logs an entry with no assigned severity level.
+// Printj logs routine information, such as ongoing status or performance.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Printj(msg string, v interface{}) {
 	logj(infosv, l, msg, v)
 }
 
-// Debug logs debug or trace information.
+// Debug logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Debug(v ...interface{}) {
 	log(debugsv, l, v...)
 }
 
-// Debugln logs debug or trace information.
+// Debugln logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Debugln(v ...interface{}) {
 	logln(debugsv, l, v...)
 }
 
-// Debugf logs debug or trace information.
+// Debugf logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Debugf(format string, v ...interface{}) {
 	logf(debugsv, l, format, v...)
 }
 
-// Debugj logs debug or trace information.
+// Debugj logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Debugj(msg string, v interface{}) {
 	logj(debugsv, l, msg, v)
