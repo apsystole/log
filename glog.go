@@ -251,256 +251,256 @@ func ForRequest(r *http.Request) (l Logger) {
 // Print logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Print(v ...interface{}) {
-	log(infosv, l, v...)
+	log(infosev, l, v...)
 }
 
 // Println logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Println(v ...interface{}) {
-	logln(infosv, l, v...)
+	logln(infosev, l, v...)
 }
 
 // Printf logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Printf(format string, v ...interface{}) {
-	logf(infosv, l, format, v...)
+	logf(infosev, l, format, v...)
 }
 
 // Printj logs routine information, such as ongoing status or performance.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Printj(msg string, v interface{}) {
-	logj(infosv, l, msg, v)
+	logj(infosev, l, msg, v)
 }
 
 // Debug logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Debug(v ...interface{}) {
-	log(debugsv, l, v...)
+	log(debugsev, l, v...)
 }
 
 // Debugln logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Debugln(v ...interface{}) {
-	logln(debugsv, l, v...)
+	logln(debugsev, l, v...)
 }
 
 // Debugf logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Debugf(format string, v ...interface{}) {
-	logf(debugsv, l, format, v...)
+	logf(debugsev, l, format, v...)
 }
 
 // Debugj logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Debugj(msg string, v interface{}) {
-	logj(debugsv, l, msg, v)
+	logj(debugsev, l, msg, v)
 }
 
 // Info logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Info(v ...interface{}) {
-	log(infosv, l, v...)
+	log(infosev, l, v...)
 }
 
 // Infoln logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Infoln(v ...interface{}) {
-	logln(infosv, l, v...)
+	logln(infosev, l, v...)
 }
 
 // Infof logs routine information, such as ongoing status or performance.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Infof(format string, v ...interface{}) {
-	logf(infosv, l, format, v...)
+	logf(infosev, l, format, v...)
 }
 
 // Infoj logs routine information, such as ongoing status or performance.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Infoj(msg string, v interface{}) {
-	logj(infosv, l, msg, v)
+	logj(infosev, l, msg, v)
 }
 
 // Notice logs normal but significant events, such as start up, shut down, or configuration.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Notice(v ...interface{}) {
-	log(noticesv, l, v...)
+	log(noticesev, l, v...)
 }
 
 // Noticeln logs normal but significant events, such as start up, shut down, or configuration.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Noticeln(v ...interface{}) {
-	logln(noticesv, l, v...)
+	logln(noticesev, l, v...)
 }
 
 // Noticef logs normal but significant events, such as start up, shut down, or configuration.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Noticef(format string, v ...interface{}) {
-	logf(noticesv, l, format, v...)
+	logf(noticesev, l, format, v...)
 }
 
 // Noticej logs normal but significant events, such as start up, shut down, or configuration.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Noticej(msg string, v interface{}) {
-	logj(noticesv, l, msg, v)
+	logj(noticesev, l, msg, v)
 }
 
 // Warning logs events that might cause problems.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Warning(v ...interface{}) {
-	log(warningsv, l, v...)
+	log(warningsev, l, v...)
 }
 
 // Warningln logs events that might cause problems.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Warningln(v ...interface{}) {
-	logln(warningsv, l, v...)
+	logln(warningsev, l, v...)
 }
 
 // Warningf logs events that might cause problems.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Warningf(format string, v ...interface{}) {
-	logf(warningsv, l, format, v...)
+	logf(warningsev, l, format, v...)
 }
 
 // Warningj logs events that might cause problems.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Warningj(msg string, v interface{}) {
-	logj(warningsv, l, msg, v)
+	logj(warningsev, l, msg, v)
 }
 
 // Error logs events likely to cause problems.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Error(v ...interface{}) {
-	log(errorsv, l, v...)
+	log(errorsev, l, v...)
 }
 
 // Errorln logs events likely to cause problems.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Errorln(v ...interface{}) {
-	logln(errorsv, l, v...)
+	logln(errorsev, l, v...)
 }
 
 // Errorf logs events likely to cause problems.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Errorf(format string, v ...interface{}) {
-	logf(errorsv, l, format, v...)
+	logf(errorsev, l, format, v...)
 }
 
 // Errorj logs events likely to cause problems.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Errorj(msg string, v interface{}) {
-	logj(errorsv, l, msg, v)
+	logj(errorsev, l, msg, v)
 }
 
 // Critical logs events that cause more severe problems or outages.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Critical(v ...interface{}) {
-	log(criticalsv, l, v...)
+	log(criticalsev, l, v...)
 }
 
 // Criticalln logs events that cause more severe problems or outages.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Criticalln(v ...interface{}) {
-	logln(criticalsv, l, v...)
+	logln(criticalsev, l, v...)
 }
 
 // Criticalf logs events that cause more severe problems or outages.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Criticalf(format string, v ...interface{}) {
-	logf(criticalsv, l, format, v...)
+	logf(criticalsev, l, format, v...)
 }
 
 // Criticalj logs events that cause more severe problems or outages.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Criticalj(msg string, v interface{}) {
-	logj(criticalsv, l, msg, v)
+	logj(criticalsev, l, msg, v)
 }
 
 // Alert logs when a person must take an action immediately.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Alert(v ...interface{}) {
-	log(alertsv, l, v...)
+	log(alertsev, l, v...)
 }
 
 // Alertln logs when a person must take an action immediately.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Alertln(v ...interface{}) {
-	logln(alertsv, l, v...)
+	logln(alertsev, l, v...)
 }
 
 // Alertf logs when a person must take an action immediately.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Alertf(format string, v ...interface{}) {
-	logf(alertsv, l, format, v...)
+	logf(alertsev, l, format, v...)
 }
 
 // Alertj logs when a person must take an action immediately.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Alertj(msg string, v interface{}) {
-	logj(alertsv, l, msg, v)
+	logj(alertsev, l, msg, v)
 }
 
 // Emergency logs when one or more systems are unusable.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Emergency(v ...interface{}) {
-	log(emergencysv, l, v...)
+	log(emergencysev, l, v...)
 }
 
 // Emergencyln logs when one or more systems are unusable.
 // Arguments are handled in the manner of fmt.Println.
 func (l Logger) Emergencyln(v ...interface{}) {
-	logln(emergencysv, l, v...)
+	logln(emergencysev, l, v...)
 }
 
 // Emergencyf logs when one or more systems are unusable.
 // Arguments are handled in the manner of fmt.Printf.
 func (l Logger) Emergencyf(format string, v ...interface{}) {
-	logf(emergencysv, l, format, v...)
+	logf(emergencysev, l, format, v...)
 }
 
 // Emergencyj logs when one or more systems are unusable.
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Emergencyj(msg string, v interface{}) {
-	logj(emergencysv, l, msg, v)
+	logj(emergencysev, l, msg, v)
 }
 
 type severity int32
 
 const (
-	defaultsv severity = iota * 100
-	debugsv
-	infosv
-	noticesv
-	warningsv
-	errorsv
-	criticalsv
-	alertsv
-	emergencysv
+	defaultsev severity = iota * 100
+	debugsev
+	infosev
+	noticesev
+	warningsev
+	errorsev
+	criticalsev
+	alertsev
+	emergencysev
 )
 
 func (s severity) String() string {
 	switch s {
 	default:
 		return ""
-	case debugsv:
+	case debugsev:
 		return "DEBUG"
-	case infosv:
+	case infosev:
 		return "INFO"
-	case noticesv:
+	case noticesev:
 		return "NOTICE"
-	case warningsv:
+	case warningsev:
 		return "WARNING"
-	case errorsv:
+	case errorsev:
 		return "ERROR"
-	case criticalsv:
+	case criticalsev:
 		return "CRITICAL"
-	case alertsv:
+	case alertsev:
 		return "ALERT"
 	}
 }
 
 func (s severity) File() *os.File {
-	if s >= errorsv {
+	if s >= errorsev {
 		return os.Stderr
 	} else {
 		return os.Stdout
