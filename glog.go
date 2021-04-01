@@ -1,5 +1,9 @@
 // Package log implements structured logging for Google App Engine, Cloud Run
 // and Cloud Functions. The API is compatible with the standard library "log" module.
+//
+// All the severities conform to the Google Cloud Logging API v2 as described in
+// https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#logseverity.
+// These severity levels are: DEBUG, INFO, NOTICE, WARNING, ERROR, CRITICAL, ALERT.
 package log
 
 import (
@@ -14,30 +18,6 @@ var std Logger
 
 // ProjectID should be set to the Google Cloud project ID.
 var ProjectID string = os.Getenv("GOOGLE_CLOUD_PROJECT")
-
-// Print logs routine information, such as ongoing status or performance.
-// Arguments are handled in the manner of fmt.Print.
-func Print(v ...interface{}) {
-	std.Print(v...)
-}
-
-// Println logs routine information, such as ongoing status or performance.
-// Arguments are handled in the manner of fmt.Println.
-func Println(v ...interface{}) {
-	std.Println(v...)
-}
-
-// Printf logs routine information, such as ongoing status or performance.
-// Arguments are handled in the manner of fmt.Printf.
-func Printf(format string, v ...interface{}) {
-	std.Printf(format, v...)
-}
-
-// Printj logs routine information, such as ongoing status or performance.
-// Arguments become jsonPayload in the log entry.
-func Printj(msg string, v interface{}) {
-	std.Printj(msg, v)
-}
 
 // Debug logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Print.
@@ -183,6 +163,70 @@ func Criticalj(msg string, v interface{}) {
 	std.Criticalj(msg, v)
 }
 
+// Print logs routine information, such as ongoing status or performance, same as Info().
+// Arguments are handled in the manner of fmt.Print.
+func Print(v ...interface{}) {
+	std.Print(v...)
+}
+
+// Println logs routine information, such as ongoing status or performance, same as Infoln().
+// Arguments are handled in the manner of fmt.Println.
+func Println(v ...interface{}) {
+	std.Println(v...)
+}
+
+// Printf logs routine information, such as ongoing status or performance, same as Infof().
+// Arguments are handled in the manner of fmt.Printf.
+func Printf(format string, v ...interface{}) {
+	std.Printf(format, v...)
+}
+
+// Printj logs routine information, such as ongoing status or performance, same as Infoj().
+// Arguments become jsonPayload in the log entry.
+func Printj(msg string, v interface{}) {
+	std.Printj(msg, v)
+}
+
+// Fatal is equivalent to a call to Critical() followed by a call to os.Exit(1).
+func Fatal(v ...interface{}) {
+	std.Fatal(v...)
+}
+
+// Fatalln is equivalent to a call to Criticalln() followed by a call to os.Exit(1).
+func Fatalln(v ...interface{}) {
+	std.Fatalln(v...)
+}
+
+// Fatalf is equivalent to a call to Criticalf() followed by a call to os.Exit(1).
+func Fatalf(format string, v ...interface{}) {
+	std.Fatalf(format, v...)
+}
+
+// Fatalj is equivalent to a call to Criticalj() followed by a call to os.Exit(1).
+func Fatalj(msg string, v interface{}) {
+	std.Fatalj(msg, v)
+}
+
+// Panic is equivalent to a call to Critical() followed by a call to panic().
+func Panic(v ...interface{}) {
+	std.Panic(v...)
+}
+
+// Panicln is equivalent to a call to Criticalln() followed by a call to panic().
+func Panicln(v ...interface{}) {
+	std.Panicln(v...)
+}
+
+// Panicf is equivalent to a call to Criticalf() followed by a call to panic().
+func Panicf(format string, v ...interface{}) {
+	std.Panicf(format, v...)
+}
+
+// Panicj is equivalent to a call to Criticalj() followed by a call to panic().
+func Panicj(msg string, v interface{}) {
+	std.Panicj(msg, v)
+}
+
 // Alert logs when a person must take an action immediately.
 // Arguments are handled in the manner of fmt.Print.
 func Alert(v ...interface{}) {
@@ -246,30 +290,6 @@ func ForRequest(r *http.Request) (l Logger) {
 		}
 	}
 	return l
-}
-
-// Print logs routine information, such as ongoing status or performance.
-// Arguments are handled in the manner of fmt.Print.
-func (l Logger) Print(v ...interface{}) {
-	log(infosev, l, v...)
-}
-
-// Println logs routine information, such as ongoing status or performance.
-// Arguments are handled in the manner of fmt.Println.
-func (l Logger) Println(v ...interface{}) {
-	logln(infosev, l, v...)
-}
-
-// Printf logs routine information, such as ongoing status or performance.
-// Arguments are handled in the manner of fmt.Printf.
-func (l Logger) Printf(format string, v ...interface{}) {
-	logf(infosev, l, format, v...)
-}
-
-// Printj logs routine information, such as ongoing status or performance.
-// Arguments become jsonPayload in the log entry.
-func (l Logger) Printj(msg string, v interface{}) {
-	logj(infosev, l, msg, v)
 }
 
 // Debug logs detailed information that could mainly be used to catch unforseen problems.
@@ -462,6 +482,78 @@ func (l Logger) Emergencyf(format string, v ...interface{}) {
 // Arguments become jsonPayload in the log entry.
 func (l Logger) Emergencyj(msg string, v interface{}) {
 	logj(emergencysev, l, msg, v)
+}
+
+// Print logs routine information, such as ongoing status or performance, same as l.Info().
+// Arguments are handled in the manner of fmt.Print.
+func (l Logger) Print(v ...interface{}) {
+	log(infosev, l, v...)
+}
+
+// Println logs routine information, such as ongoing status or performance, same as l.Infoln().
+// Arguments are handled in the manner of fmt.Println.
+func (l Logger) Println(v ...interface{}) {
+	logln(infosev, l, v...)
+}
+
+// Printf logs routine information, such as ongoing status or performance, same as l.Infof().
+// Arguments are handled in the manner of fmt.Printf.
+func (l Logger) Printf(format string, v ...interface{}) {
+	logf(infosev, l, format, v...)
+}
+
+// Printj logs routine information, such as ongoing status or performance, same as l.Infoj().
+// Arguments become jsonPayload in the log entry.
+func (l Logger) Printj(msg string, v interface{}) {
+	logj(infosev, l, msg, v)
+}
+
+// Fatal is equivalent to a call to l.Critical() followed by a call to os.Exit(1).
+func (l Logger) Fatal(v ...interface{}) {
+	log(criticalsev, l, v...)
+	os.Exit(1)
+}
+
+// Fatalln is equivalent to a call to l.Criticalln() followed by a call to os.Exit(1).
+func (l Logger) Fatalln(v ...interface{}) {
+	logln(criticalsev, l, v...)
+	os.Exit(1)
+}
+
+// Fatalf is equivalent to a call to l.Criticalf() followed by a call to os.Exit(1).
+func (l Logger) Fatalf(format string, v ...interface{}) {
+	logf(criticalsev, l, format, v...)
+	os.Exit(1)
+}
+
+// Fatalj is equivalent to a call to l.Criticalj() followed by a call to os.Exit(1).
+func (l Logger) Fatalj(msg string, v interface{}) {
+	logj(criticalsev, l, msg, v)
+	os.Exit(1)
+}
+
+// Panic is equivalent to a call to l.Critical() followed by a call to panic().
+func (l Logger) Panic(v ...interface{}) {
+	log(criticalsev, l, v...)
+	panic(fmt.Sprint(v...))
+}
+
+// Panicln is equivalent to a call to l.Criticalln() followed by a call to panic().
+func (l Logger) Panicln(v ...interface{}) {
+	logln(criticalsev, l, v...)
+	panic(fmt.Sprintln(v...))
+}
+
+// Panicf is equivalent to a call to l.Criticalf() followed by a call to panic().
+func (l Logger) Panicf(format string, v ...interface{}) {
+	logf(criticalsev, l, format, v...)
+	panic(fmt.Sprintf(format, v...))
+}
+
+// Panicj is equivalent to a call to l.Criticalj() followed by a call to panic().
+func (l Logger) Panicj(msg string, v interface{}) {
+	logj(criticalsev, l, msg, v)
+	panic(v)
 }
 
 type severity int32
