@@ -3,7 +3,7 @@
 //
 // All the severities conform to the Google Cloud Logging API v2 as described in
 // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#logseverity.
-// These severity levels are: DEBUG, INFO, NOTICE, WARNING, ERROR, CRITICAL, ALERT.
+// These severity levels are: DEBUG, INFO, NOTICE, WARNING, ERROR, CRITICAL, ALERT, EMERGENCY.
 package log
 
 import (
@@ -588,6 +588,8 @@ func (s severity) String() string {
 		return "CRITICAL"
 	case alertsev:
 		return "ALERT"
+	case emergencysev:
+		return "EMERGENCY"
 	}
 }
 
