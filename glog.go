@@ -4,6 +4,9 @@
 // All the severities conform to the Google Cloud Logging API v2 as described in
 // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#logseverity.
 // These severity levels are: DEBUG, INFO, NOTICE, WARNING, ERROR, CRITICAL, ALERT, EMERGENCY.
+//
+// The ERROR, CRITICAL, ALERT, EMERGENCY logs are written to the standard error stream, while
+// the remaining logs are written to the standard output.
 package log
 
 import (
@@ -534,20 +537,17 @@ func (l Logger) Fatalj(msg string, v interface{}) {
 
 // Panic is equivalent to a call to l.Critical() followed by a call to panic().
 func (l Logger) Panic(v ...interface{}) {
-	log(criticalsev, l, v...)
-	panic(fmt.Sprint(v...))
+	panic(log(criticalsev, l, v...))
 }
 
 // Panicln is equivalent to a call to l.Criticalln() followed by a call to panic().
 func (l Logger) Panicln(v ...interface{}) {
-	logln(criticalsev, l, v...)
-	panic(fmt.Sprintln(v...))
+	panic(logln(criticalsev, l, v...))
 }
 
 // Panicf is equivalent to a call to l.Criticalf() followed by a call to panic().
 func (l Logger) Panicf(format string, v ...interface{}) {
-	logf(criticalsev, l, format, v...)
-	panic(fmt.Sprintf(format, v...))
+	panic(logf(criticalsev, l, format, v...))
 }
 
 // Panicj is equivalent to a call to l.Criticalj() followed by a call to panic().
@@ -601,21 +601,22 @@ func (s severity) File() *os.File {
 	}
 }
 
-func log(s severity, l Logger, v ...interface{}) {
-	logs(s, l, fmt.Sprint(v...))
+func log(s severity, l Logger, v ...interface{}) string {
+	return logs(s, l, fmt.Sprint(v...))
 }
 
-func logln(s severity, l Logger, v ...interface{}) {
-	logs(s, l, fmt.Sprintln(v...))
+func logln(s severity, l Logger, v ...interface{}) string {
+	return logs(s, l, fmt.Sprintln(v...))
 }
 
-func logf(s severity, l Logger, format string, v ...interface{}) {
-	logs(s, l, fmt.Sprintf(format, v...))
+func logf(s severity, l Logger, format string, v ...interface{}) string {
+	return logs(s, l, fmt.Sprintf(format, v...))
 }
 
-func logs(s severity, l Logger, msg string) {
+func logs(s severity, l Logger, msg string) string {
 	entry := entry{msg, s.String(), l.trace}
 	json.NewEncoder(s.File()).Encode(entry)
+	return msg
 }
 
 func logj(s severity, l Logger, msg string, j interface{}) {
