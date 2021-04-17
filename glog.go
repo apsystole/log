@@ -278,23 +278,6 @@ func Emergencyj(msg string, v interface{}) {
 	std.Emergencyj(msg, v)
 }
 
-type Logger struct {
-	trace  string
-	spanID string
-}
-
-func ForRequest(r *http.Request) (l Logger) {
-	if ProjectID != "" {
-		h := r.Header.Get("X-Cloud-Trace-Context")
-		if i := strings.IndexByte(h, '/'); i > 0 {
-			if t := h[:i]; strings.Count(t, "0") != len(t) {
-				l.trace = fmt.Sprintf("projects/%s/traces/%s", ProjectID, t)
-			}
-		}
-	}
-	return l
-}
-
 // Debug logs detailed information that could mainly be used to catch unforseen problems.
 // Arguments are handled in the manner of fmt.Print.
 func (l Logger) Debug(v ...interface{}) {
@@ -554,6 +537,25 @@ func (l Logger) Panicf(format string, v ...interface{}) {
 func (l Logger) Panicj(msg string, v interface{}) {
 	logj(criticalsev, l, msg, v)
 	panic(v)
+}
+
+type Logger struct {
+	trace  string
+	spanID string
+}
+
+// ForRequest creates a new Logger. All the messages logged
+// through it will trace back to the HTTP request r.
+func ForRequest(r *http.Request) (l Logger) {
+	if ProjectID != "" {
+		h := r.Header.Get("X-Cloud-Trace-Context")
+		if i := strings.IndexByte(h, '/'); i > 0 {
+			if t := h[:i]; strings.Count(t, "0") != len(t) {
+				l.trace = fmt.Sprintf("projects/%s/traces/%s", ProjectID, t)
+			}
+		}
+	}
+	return l
 }
 
 type severity int32
