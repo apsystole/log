@@ -1,21 +1,17 @@
-package log_test
+package log
 
-import "github.com/apsystole/log"
+// Test the public interface, but inject some private dependencies; run it from the same package.
 
-func ExamplePrint() {
-	log.Print("Test")
-	// Output:
-	// {"message":"Test","severity":"INFO"}
-}
+import (
+	"testing"
+)
 
-func ExampleNoticef() {
-	log.Noticef("Hello %q!", "Google")
-	// Output:
-	// {"message":"Hello \"Google\"!","severity":"NOTICE"}
-}
-
-func ExampleWarningj() {
-	log.Warningj("Warning", map[string]string{"component": "app"})
-	// Output:
-	// {"component":"app","message":"Warning","severity":"WARNING"}
+func TestPanic(t *testing.T) {
+	defer func() {
+		want := "a"
+		if r := recover(); r != want {
+			t.Errorf("got panic %q expected %q", r, want)
+		}
+	}()
+	Panic("a")
 }

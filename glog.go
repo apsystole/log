@@ -12,6 +12,7 @@ package log
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -556,6 +557,13 @@ func ForRequest(r *http.Request) (l Logger) {
 		}
 	}
 	return l
+}
+
+// New is for interface-level compatibility with standard library's
+// "log" package. All arguments are ignored.
+// The ForRequest() constructor is  more useful.
+func New(dummy1 io.Writer, dummy2 string, dummy3 int) *Logger {
+	return &Logger{}
 }
 
 type severity int32
