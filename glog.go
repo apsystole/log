@@ -541,8 +541,9 @@ func (l *Logger) Panicj(msg string, v interface{}) {
 }
 
 type Logger struct {
-	trace  string
-	spanID string
+	out   io.Writer
+	err   io.Writer
+	trace string
 }
 
 // ForRequest creates a new Logger. All the messages logged
@@ -561,10 +562,28 @@ func ForRequest(r *http.Request) *Logger {
 }
 
 // New is for interface-level compatibility with standard library's
-// "log" package. All arguments are ignored.
-// The ForRequest() constructor is  more useful.
-func New(dummy1 io.Writer, dummy2 string, dummy3 int) *Logger {
-	return &Logger{}
+// "log" package. All the logged messages are written to w, one write per message.
+// Remaining arguments are ignored.
+// The ForRequest() constructor is more useful.
+func New(w io.Writer, dummy2 string, dummy3 int) *Logger {
+	return &Logger{
+		out: w,
+		err: w,
+	}
+}
+
+func (l *Logger) writer(s severity) io.Writer {
+	if s.IsErrorish() {
+		if l.err != nil {
+			return l.err
+		}
+		return os.Stderr
+	} else {
+		if l.out != nil {
+			return l.out
+		}
+		return os.Stdout
+	}
 }
 
 type severity int32
@@ -604,12 +623,9 @@ func (s severity) String() string {
 	}
 }
 
-func (s severity) File() *os.File {
-	if s >= errorsev {
-		return os.Stderr
-	} else {
-		return os.Stdout
-	}
+// IsErrorish returns true for severity ERROR and above it.
+func (s severity) IsErrorish() bool {
+	return s >= errorsev
 }
 
 func log(s severity, l *Logger, v ...interface{}) string {
@@ -626,7 +642,7 @@ func logf(s severity, l *Logger, format string, v ...interface{}) string {
 
 func logs(s severity, l *Logger, msg string) string {
 	entry := entry{msg, s.String(), l.trace}
-	json.NewEncoder(s.File()).Encode(entry)
+	json.NewEncoder(l.writer(s)).Encode(entry)
 	return msg
 }
 
@@ -648,7 +664,7 @@ func logj(s severity, l *Logger, msg string, j interface{}) {
 		entry["logging.googleapis.com/trace"], _ = json.Marshal(v)
 	}
 
-	json.NewEncoder(s.File()).Encode(entry)
+	json.NewEncoder(l.writer(s)).Encode(entry)
 }
 
 type entry struct {
