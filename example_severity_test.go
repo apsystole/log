@@ -2,19 +2,20 @@ package log_test
 
 import "github.com/apsystole/log"
 
-func ExampleSevRecommendations() {
+// Example shows typical severity recommendations.
+func Example() {
 	log.Debug("the lowest level")
-	log.Print("phase 2 processing ended") // or Info()
+	log.Print("phase 2 processing ended") // or log.Info()
 	log.Notice("shutting down normally...")
-	log.Warning("retrying shutdown...")
+	log.Warning("difficulties, retrying shutdown...")
 }
 
+// Errors are used sparingly to draw attention of a human, sooner or later.
 func Errors() {
-	// Use these sparingly to draw attention of a human (sooner or later):
-	log.Error("a minor problem")
+	log.Error("a minor problem that a real human should act on")
 	log.Critical("a major problem")
 	log.Fatal("a major problem - aborting")
 	log.Panic("a major problem - dumping stacktraces and aborting")
-	log.Alert("intervetion of a real human likely required")
-	log.Emergency("waky waky dear on-duty person, eggs and baky")
+	log.Alert("waky waky dear on-duty person, eggs and baky")
+	log.Emergency("core functionality is down and needs a human to rescue it")
 }
