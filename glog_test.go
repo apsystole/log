@@ -27,3 +27,10 @@ func TestPanic(t *testing.T) {
 	// Act
 	l.Panic("a")
 }
+
+func BenchmarkDebug(b *testing.B) {
+	l := New(nil, "", 0)
+	for i := 0; i < b.N; i++ {
+		l.Debug("test")
+	}
+}

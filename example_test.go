@@ -4,7 +4,6 @@ package log_test
 
 import (
 	"io"
-	"testing"
 
 	"github.com/apsystole/log"
 )
@@ -44,11 +43,4 @@ func ExampleNoticej() {
 	log.Noticej("warning", obj)
 	// Output:
 	// {"Component":"app","Seq":42,"message":"warning","severity":"NOTICE"}
-}
-
-func BenchmarkDebug(b *testing.B) {
-	l := log.New(nil, "", 0)
-	for i := 0; i < b.N; i++ {
-		l.Debug("test")
-	}
 }
