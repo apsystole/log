@@ -6,6 +6,20 @@ Go logging library for GCP App Engine, Cloud Run, Cloud Functions:
 - Zero **dependencies**, it is a stdlib-only module. Nul, zilch, nada!
 - Backward compatible with older Go versions as far as 1.8.
 
-![Coloring on GCP](https://i.imgur.com/3lLZ5tS.png)
+## Screenshot
 
-See the [generated godoc on pkg.go.dev](https://pkg.go.dev/github.com/apsystole/log).
+![Coloring on GCP](https://i.imgur.com/KXQfr8a.png)
+
+## Examples
+
+```go
+package log_test
+
+import "github.com/apsystole/log"
+
+func main() {
+    log.Print("my message")
+}
+```
+
+More details to be found in the [documentation on pkg.go.dev](https://pkg.go.dev/github.com/apsystole/log).
