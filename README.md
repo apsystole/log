@@ -13,7 +13,7 @@ Go logging library for GCP App Engine, Cloud Run, Cloud Functions:
 ## Examples
 
 ```go
-package log_test
+package main
 
 import "github.com/apsystole/log"
 
