@@ -29,8 +29,10 @@ func TestPanic(t *testing.T) {
 }
 
 func BenchmarkDebug(b *testing.B) {
-	l := New(nil, "", 0)
+	buf := &bytes.Buffer{} // quite unrealistic, as a write to file here is about 14 000 ns
+	l := New(buf, "", 0)
 	for i := 0; i < b.N; i++ {
 		l.Debug("test")
+		buf.Reset()
 	}
 }
