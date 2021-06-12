@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 )
 
 var std Logger
@@ -543,6 +544,7 @@ func (l *Logger) Panicj(msg string, v interface{}) {
 type Logger struct {
 	out   io.Writer
 	err   io.Writer
+	mu    sync.Mutex
 	trace string
 }
 
@@ -640,14 +642,25 @@ func logf(s severity, l *Logger, format string, v ...interface{}) string {
 	return logs(s, l, fmt.Sprintf(format, v...))
 }
 
+type entry struct {
+	Message  string `json:"message"`
+	Severity string `json:"severity,omitempty"`
+	Trace    string `json:"logging.googleapis.com/trace,omitempty"`
+}
+
 func logs(s severity, l *Logger, msg string) string {
 	entry := entry{msg, s.String(), l.trace}
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	json.NewEncoder(l.writer(s)).Encode(entry)
+
 	return msg
 }
 
 func logj(s severity, l *Logger, msg string, j interface{}) {
 	entry := make(map[string]json.RawMessage)
+
 	if buf, err := json.Marshal(j); err != nil {
 		panic(err)
 	} else if err := json.Unmarshal(buf, &entry); err != nil {
@@ -664,11 +677,7 @@ func logj(s severity, l *Logger, msg string, j interface{}) {
 		entry["logging.googleapis.com/trace"], _ = json.Marshal(v)
 	}
 
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	json.NewEncoder(l.writer(s)).Encode(entry)
-}
-
-type entry struct {
-	Message  string `json:"message"`
-	Severity string `json:"severity,omitempty"`
-	Trace    string `json:"logging.googleapis.com/trace,omitempty"`
 }
