@@ -42,5 +42,5 @@ func ExampleNoticej() {
 	}
 	log.Noticej("warning", obj)
 	// Output:
-	// {"Component":"app","Seq":42,"message":"warning","severity":"NOTICE"}
+	// {"message":"warning","severity":"NOTICE","Seq":42,"Component":"app"}
 }

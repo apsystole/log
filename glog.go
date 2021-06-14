@@ -659,6 +659,118 @@ func logs(s severity, l *Logger, msg string) string {
 }
 
 func logj(s severity, l *Logger, msg string, j interface{}) {
+	if j == nil {
+		log(s, l, msg)
+		return
+	}
+	// TODO maybe use reflect to catch things like map[string]string, but it'd be
+	// best effort only.
+	// This allows to check for duplicate fields, e.g. "message", if a user throws
+	// at us a map which they don't bother to sanitize.
+	//
+	// This is a dead end, it doesn't catch map[string]string:
+	// switch v := j.(type) {
+	// case map[string]interface{}:
+	// 	if _, ok := v["message"]; ok {
+	// 	}
+	// }
+	buf, err := json.Marshal(j)
+	if err != nil {
+		panic(err)
+	}
+	logRawJSON(s, l, msg, buf)
+}
+
+// logRawJSON writes the buf to the l logger. The buf should be
+// an encoded JSON and its first byte must be '{'.
+// The s and msg are brutally inserted as "severity" and "message" top-level JSON fields.
+// The buf should not contain "severity", "message", or "logging.googleapis.com/trace"
+// top-level JSON fields.
+// No attempt is made to check whether the resulting string does not have these fields
+// duplicated and whether it is a valid JSON. Spoiler alert: GCP Logging API seems to be
+// quite gracefully handling malformed JSON entries with such duplicate fields.
+func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
+	var msgj, sevj, tracej []byte
+	var err error
+
+	if msg != "" {
+		msgj, err = json.Marshal(msg)
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	sev := s.String()
+	if sev != "" {
+		sevj, err = json.Marshal(sev)
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	if l.trace != "" {
+		tracej, err = json.Marshal(l.trace)
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	w := l.writer(s)
+	jsonStruct := len(buf) > 0 && buf[0] == '{'
+
+	if jsonStruct {
+		buf = buf[1:]
+	}
+
+	// Critical Section begins
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	w.Write([]byte("{"))
+	comma := []byte{}
+
+	if msg != "" {
+		w.Write([]byte("\"message\":"))
+		w.Write(msgj)
+		comma = []byte(",")
+	}
+
+	if sev != "" {
+		w.Write(comma)
+		w.Write([]byte("\"severity\":"))
+		w.Write(sevj)
+		comma = []byte(",")
+	}
+
+	if l.trace != "" {
+		w.Write(comma)
+		w.Write([]byte("\"logging.googleapis.com/trace\":"))
+		w.Write(tracej)
+		comma = []byte(",")
+	}
+
+	if !jsonStruct {
+		w.Write(comma)
+		w.Write([]byte("\"value\":"))
+		w.Write(buf)
+		w.Write([]byte("}\n"))
+		return
+	}
+
+	if len(buf) > 1 {
+		w.Write(comma)
+	}
+	w.Write(buf)
+
+	if buf[len(buf)-1] != '\n' {
+		w.Write([]byte("\n"))
+	}
+}
+
+// logjStdlib is only here to benchmark the stdlib "encoding/json"
+// approach.
+func logjStdlib(s severity, l *Logger, msg string, j interface{}) {
 	entry := make(map[string]json.RawMessage)
 
 	if buf, err := json.Marshal(j); err != nil {
