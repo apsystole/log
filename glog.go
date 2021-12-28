@@ -7,6 +7,13 @@
 //
 // The ERROR, CRITICAL, ALERT, EMERGENCY logs are written to the standard error stream, while
 // the remaining logs are written to the standard output.
+//
+// In the series-"j" functions (Debugj, Printj, Warningj, etc.) the value v should be a struct.
+// The struct when encoded as JSON *must not* have fields "message", "severity", or
+// "logging.googleapis.com/trace" on its top level. FIXME be stable here
+// It is the responsibility of the caller to verify those. The nested structs on the other hand
+// may have any field names.
+// See https://cloud.google.com/logging/docs/structured-logging
 package log
 
 import (
