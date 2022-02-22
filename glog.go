@@ -22,27 +22,27 @@ import (
 var std Logger
 
 // ProjectID should be set to the Google Cloud project ID.
-var ProjectID string = os.Getenv("GOOGLE_CLOUD_PROJECT")
+var ProjectID = os.Getenv("GOOGLE_CLOUD_PROJECT")
 
-// Debug logs detailed information that could mainly be used to catch unforseen problems.
+// Debug logs detailed information that could mainly be used to catch unforeseen problems.
 // Arguments are handled in the manner of fmt.Print.
 func Debug(v ...interface{}) {
 	std.Debug(v...)
 }
 
-// Debugln logs detailed information that could mainly be used to catch unforseen problems.
+// Debugln logs detailed information that could mainly be used to catch unforeseen problems.
 // Arguments are handled in the manner of fmt.Println.
 func Debugln(v ...interface{}) {
 	std.Debugln(v...)
 }
 
-// Debugf logs detailed information that could mainly be used to catch unforseen problems.
+// Debugf logs detailed information that could mainly be used to catch unforeseen problems.
 // Arguments are handled in the manner of fmt.Printf.
 func Debugf(format string, v ...interface{}) {
 	std.Debugf(format, v...)
 }
 
-// Debugj logs detailed information that could mainly be used to catch unforseen problems.
+// Debugj logs detailed information that could mainly be used to catch unforeseen problems.
 // Argument v becomes jsonPayload field in the log entry.
 func Debugj(msg string, v interface{}) {
 	std.Debugj(msg, v)
@@ -280,25 +280,25 @@ func Emergencyj(msg string, v interface{}) {
 	std.Emergencyj(msg, v)
 }
 
-// Debug logs detailed information that could mainly be used to catch unforseen problems.
+// Debug logs detailed information that could mainly be used to catch unforeseen problems.
 // Arguments are handled in the manner of fmt.Print.
 func (l *Logger) Debug(v ...interface{}) {
 	log(debugsev, l, v...)
 }
 
-// Debugln logs detailed information that could mainly be used to catch unforseen problems.
+// Debugln logs detailed information that could mainly be used to catch unforeseen problems.
 // Arguments are handled in the manner of fmt.Println.
 func (l *Logger) Debugln(v ...interface{}) {
 	logln(debugsev, l, v...)
 }
 
-// Debugf logs detailed information that could mainly be used to catch unforseen problems.
+// Debugf logs detailed information that could mainly be used to catch unforeseen problems.
 // Arguments are handled in the manner of fmt.Printf.
 func (l *Logger) Debugf(format string, v ...interface{}) {
 	logf(debugsev, l, format, v...)
 }
 
-// Debugj logs detailed information that could mainly be used to catch unforseen problems.
+// Debugj logs detailed information that could mainly be used to catch unforeseen problems.
 // Argument v becomes jsonPayload field in the log entry.
 func (l *Logger) Debugj(msg string, v interface{}) {
 	logj(debugsev, l, msg, v)
@@ -552,6 +552,7 @@ type Logger struct {
 // through it will trace back to the HTTP request r.
 func ForRequest(r *http.Request) *Logger {
 	l := &Logger{}
+
 	if ProjectID != "" {
 		h := r.Header.Get("X-Cloud-Trace-Context")
 		if i := strings.IndexByte(h, '/'); i > 0 {
@@ -560,6 +561,7 @@ func ForRequest(r *http.Request) *Logger {
 			}
 		}
 	}
+
 	return l
 }
 
@@ -579,20 +581,21 @@ func (l *Logger) writer(s severity) io.Writer {
 		if l.err != nil {
 			return l.err
 		}
+
 		return os.Stderr
-	} else {
-		if l.out != nil {
-			return l.out
-		}
-		return os.Stdout
 	}
+
+	if l.out != nil {
+		return l.out
+	}
+
+	return os.Stdout
 }
 
 type severity int32
 
 const (
-	defaultsev severity = iota * 100
-	debugsev
+	debugsev severity = iota * 100
 	infosev
 	noticesev
 	warningsev
@@ -653,7 +656,7 @@ func logs(s severity, l *Logger, msg string) string {
 
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	json.NewEncoder(l.writer(s)).Encode(entry)
+	_ = json.NewEncoder(l.writer(s)).Encode(entry)
 
 	return msg
 }
@@ -678,6 +681,7 @@ func logj(s severity, l *Logger, msg string, j interface{}) {
 	if err != nil {
 		panic(err)
 	}
+
 	logRawJSON(s, l, msg, buf)
 }
 
@@ -695,24 +699,24 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 
 	if msg != "" {
 		msgj, err = json.Marshal(msg)
-	}
-	if err != nil {
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	sev := s.String()
 	if sev != "" {
 		sevj, err = json.Marshal(sev)
-	}
-	if err != nil {
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	if l.trace != "" {
 		tracej, err = json.Marshal(l.trace)
-	}
-	if err != nil {
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	w := l.writer(s)
@@ -722,49 +726,81 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 		buf = buf[1:]
 	}
 
-	// Critical Section begins
-
+	// Critical Section
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	w.Write([]byte("{"))
+	if _, err := w.Write([]byte("{")); err != nil {
+		return
+	}
+
 	comma := []byte{}
 
 	if msg != "" {
-		w.Write([]byte("\"message\":"))
-		w.Write(msgj)
+		if _, err := w.Write([]byte("\"message\":")); err != nil {
+			return
+		}
+		if _, err := w.Write(msgj); err != nil {
+			return
+		}
+
 		comma = []byte(",")
 	}
 
 	if sev != "" {
-		w.Write(comma)
-		w.Write([]byte("\"severity\":"))
-		w.Write(sevj)
+		if _, err := w.Write(comma); err != nil {
+			return
+		}
+		if _, err := w.Write([]byte("\"severity\":")); err != nil {
+			return
+		}
+		if _, err := w.Write(sevj); err != nil {
+			return
+		}
+
 		comma = []byte(",")
 	}
 
 	if l.trace != "" {
-		w.Write(comma)
-		w.Write([]byte("\"logging.googleapis.com/trace\":"))
-		w.Write(tracej)
+		if _, err := w.Write(comma); err != nil {
+			return
+		}
+		if _, err := w.Write([]byte("\"logging.googleapis.com/trace\":")); err != nil {
+			return
+		}
+		if _, err := w.Write(tracej); err != nil {
+			return
+		}
+
 		comma = []byte(",")
 	}
 
 	if !jsonStruct {
-		w.Write(comma)
-		w.Write([]byte("\"value\":"))
-		w.Write(buf)
-		w.Write([]byte("}\n"))
+		if _, err := w.Write(comma); err != nil {
+			return
+		}
+		if _, err := w.Write([]byte("\"value\":")); err != nil {
+			return
+		}
+		if _, err := w.Write(buf); err != nil {
+			return
+		}
+		_, _ = w.Write([]byte("}\n"))
+
 		return
 	}
 
 	if len(buf) > 1 {
-		w.Write(comma)
+		if _, err := w.Write(comma); err != nil {
+			return
+		}
 	}
-	w.Write(buf)
+	if _, err := w.Write(buf); err != nil {
+		return
+	}
 
 	if buf[len(buf)-1] != '\n' {
-		w.Write([]byte("\n"))
+		_, _ = w.Write([]byte("\n"))
 	}
 }
 
@@ -791,5 +827,5 @@ func logjStdlib(s severity, l *Logger, msg string, j interface{}) {
 
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	json.NewEncoder(l.writer(s)).Encode(entry)
+	_ = json.NewEncoder(l.writer(s)).Encode(entry)
 }

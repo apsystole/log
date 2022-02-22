@@ -6,13 +6,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"sync"
 	"testing"
 )
 
 func TestPanic(t *testing.T) {
 	// Arrange
-	wantJson := "{\"message\":\"a\",\"severity\":\"CRITICAL\"}\n"
+	wantJSON := "{\"message\":\"a\",\"severity\":\"CRITICAL\"}\n"
 	wantPanic := "a"
 	buf := &bytes.Buffer{}
 	l := New(buf, "", 0)
@@ -22,8 +21,8 @@ func TestPanic(t *testing.T) {
 		if gotPanic := recover(); gotPanic != wantPanic {
 			t.Errorf("unexpected panic, got:\n%q\nexpected:\n%q\n", gotPanic, wantPanic)
 		}
-		if wantJson != buf.String() {
-			t.Errorf("unexpected output, got:\n%q\nexpected:\n%q\n", buf.String(), wantJson)
+		if wantJSON != buf.String() {
+			t.Errorf("unexpected output, got:\n%q\nexpected:\n%q\n", buf.String(), wantJSON)
 		}
 	}()
 
@@ -37,13 +36,14 @@ func TestLogger_Debugj(t *testing.T) {
 	type fields struct {
 		out   io.Writer
 		err   io.Writer
-		mu    sync.Mutex
 		trace string
 	}
+
 	type args struct {
 		msg string
 		v   interface{}
 	}
+
 	tests := []struct {
 		name   string
 		fields fields
@@ -62,12 +62,13 @@ func TestLogger_Debugj(t *testing.T) {
 		want: `{"message":"test","severity":"DEBUG"}
 `,
 	}}
+
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			l := &Logger{
 				out:   tt.fields.out,
 				err:   tt.fields.err,
-				mu:    tt.fields.mu,
 				trace: tt.fields.trace,
 			}
 			l.Debugj(tt.args.msg, tt.args.v)
@@ -365,8 +366,8 @@ func BenchmarkJsonTen(b *testing.B) {
 		Field10: "test",
 	}
 	for i := 0; i < b.N; i++ {
-		json.NewEncoder(buf).Encode(msg)
-		json.Unmarshal(buf.Bytes(), msg)
+		_ = json.NewEncoder(buf).Encode(msg)
+		_ = json.Unmarshal(buf.Bytes(), msg)
 		buf.Reset()
 	}
 }
