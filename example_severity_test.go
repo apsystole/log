@@ -11,6 +11,7 @@ func Example() {
 }
 
 // Errors are used sparingly to draw attention of a human, sooner or later.
+//nolint: unused
 func Errors() {
 	log.Error("a minor problem that a real human should act on")
 	log.Critical("a major problem")
