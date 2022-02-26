@@ -2,10 +2,10 @@
 
 Go logging library for GCP App Engine, Cloud Run, Cloud Functions:
 
-- Encodes **severity** so that coloring works in the Google web-based Logs Explorer.
+- Encodes the severities so that **coloring** works in the Google web-based Logs Explorer.
 - Zero **dependencies**, it is a stdlib-only module. Nul, zilch, nada!
 - Safe for concurrent logging.
-- Backward compatible with older Go versions as far as 1.8.
+- Backward compatible with older Go versions as far as 1.9.4.
 
 ## Screenshot
 
