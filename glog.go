@@ -43,7 +43,7 @@ func Debugf(format string, v ...interface{}) {
 }
 
 // Debugj logs detailed information that could mainly be used to catch unforseen problems.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes jsonPayload field in the log entry.
 func Debugj(msg string, v interface{}) {
 	std.Debugj(msg, v)
 }
@@ -299,7 +299,7 @@ func (l *Logger) Debugf(format string, v ...interface{}) {
 }
 
 // Debugj logs detailed information that could mainly be used to catch unforseen problems.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes jsonPayload field in the log entry.
 func (l *Logger) Debugj(msg string, v interface{}) {
 	logj(debugsev, l, msg, v)
 }
