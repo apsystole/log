@@ -405,3 +405,29 @@ func BenchmarkStdlibTen(b *testing.B) {
 		buf.Reset()
 	}
 }
+
+// logjStdlib is only here to benchmark the stdlib "encoding/json"
+// approach. Hopefully our method is much faster than stdlib.
+func logjStdlib(s severity, l *Logger, msg string, j interface{}) {
+	entry := make(map[string]json.RawMessage)
+
+	if buf, err := json.Marshal(j); err != nil {
+		panic(err)
+	} else if err := json.Unmarshal(buf, &entry); err != nil {
+		panic(err)
+	}
+
+	if v := msg; v != "" {
+		entry["message"], _ = json.Marshal(v)
+	}
+	if v := s.String(); v != "" {
+		entry["severity"], _ = json.Marshal(v)
+	}
+	if v := l.trace; v != "" {
+		entry["logging.googleapis.com/trace"], _ = json.Marshal(v)
+	}
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	_ = json.NewEncoder(l.writer(s)).Encode(entry)
+}

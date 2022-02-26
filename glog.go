@@ -679,7 +679,9 @@ func logj(s severity, l *Logger, msg string, j interface{}) {
 	// }
 	buf, err := json.Marshal(j)
 	if err != nil {
-		panic(err)
+		// Ignore. This is just logging. Do not panic the entire app
+		// just because the caller had botched their x.Marshal(), etc.
+		return
 	}
 
 	logRawJSON(s, l, msg, buf)
@@ -700,7 +702,7 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 	if msg != "" {
 		msgj, err = json.Marshal(msg)
 		if err != nil {
-			panic(err)
+			return
 		}
 	}
 
@@ -708,14 +710,14 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 	if sev != "" {
 		sevj, err = json.Marshal(sev)
 		if err != nil {
-			panic(err)
+			return
 		}
 	}
 
 	if l.trace != "" {
 		tracej, err = json.Marshal(l.trace)
 		if err != nil {
-			panic(err)
+			return
 		}
 	}
 
@@ -804,28 +806,3 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 	}
 }
 
-// logjStdlib is only here to benchmark the stdlib "encoding/json"
-// approach.
-func logjStdlib(s severity, l *Logger, msg string, j interface{}) {
-	entry := make(map[string]json.RawMessage)
-
-	if buf, err := json.Marshal(j); err != nil {
-		panic(err)
-	} else if err := json.Unmarshal(buf, &entry); err != nil {
-		panic(err)
-	}
-
-	if v := msg; v != "" {
-		entry["message"], _ = json.Marshal(v)
-	}
-	if v := s.String(); v != "" {
-		entry["severity"], _ = json.Marshal(v)
-	}
-	if v := l.trace; v != "" {
-		entry["logging.googleapis.com/trace"], _ = json.Marshal(v)
-	}
-
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	_ = json.NewEncoder(l.writer(s)).Encode(entry)
-}
