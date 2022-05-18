@@ -1,0 +1,18 @@
+{
+    "extends": [
+        "config:base"
+    ],
+    "packageRules": [
+        {
+            "matchUpdateTypes": [
+                "minor",
+                "patch"
+            ],
+            "matchManagers": [
+                "gomod"
+            ],
+            "groupName": "go packages"
+        }
+    ],
+    "prConcurrentLimit": 1
+}
