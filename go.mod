@@ -1,3 +1,3 @@
 module github.com/apsystole/log
 
-go 1.11
+go 1.18
