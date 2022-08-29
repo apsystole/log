@@ -21,7 +21,9 @@ import (
 
 var std Logger
 
-// ProjectID should be set to the Google Cloud project ID.
+// ProjectID should be set to the Google Cloud project ID to properly correlate the message
+// traces to HTTP requests, if you use ForRequest. The initial value is taken from the
+// environment variable GOOGLE_CLOUD_PROJECT.
 var ProjectID = os.Getenv("GOOGLE_CLOUD_PROJECT")
 
 // Debug logs detailed information that could mainly be used to catch unforeseen problems.
@@ -548,13 +550,16 @@ type Logger struct {
 	trace string
 }
 
-// ForRequest creates a new Logger. All the messages logged
-// through it will trace back to the HTTP request r.
-func ForRequest(r *http.Request) *Logger {
+// ForRequest creates a new Logger. All the messages logged through it will trace
+// back to the HTTP request, based on its header "X-Cloud-Trace-Context" combined
+// with the package var ProjectID.
+//
+// Setting package var ProjectID to empty disables such tracing altogether.
+func ForRequest(request *http.Request) *Logger {
 	l := &Logger{}
 
 	if ProjectID != "" {
-		h := r.Header.Get("X-Cloud-Trace-Context")
+		h := request.Header.Get("X-Cloud-Trace-Context")
 		if i := strings.IndexByte(h, '/'); i > 0 {
 			if t := h[:i]; strings.Count(t, "0") != len(t) {
 				l.trace = fmt.Sprintf("projects/%s/traces/%s", ProjectID, t)
@@ -566,8 +571,9 @@ func ForRequest(r *http.Request) *Logger {
 }
 
 // New is for interface-level compatibility with standard library's
-// "log" package. All the logged messages are written to w, one write per message.
+// "log" package. It creates a new Logger, which streams all its messages to w.
 // Remaining arguments are ignored.
+//
 // The ForRequest() constructor is more useful.
 func New(w io.Writer, dummy2 string, dummy3 int) *Logger {
 	return &Logger{
