@@ -420,12 +420,10 @@ func logjStdlib(s severity, l *Logger, msg string, j interface{}) {
 	if v := msg; v != "" {
 		entry["message"], _ = json.Marshal(v)
 	}
-	if v := s.String(); v != "" {
-		entry["severity"], _ = json.Marshal(v)
-	}
 	if v := l.trace; v != "" {
 		entry["logging.googleapis.com/trace"], _ = json.Marshal(v)
 	}
+	entry["severity"], _ = s.MarshalJSON()
 
 	l.mu.Lock()
 	defer l.mu.Unlock()

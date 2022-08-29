@@ -605,26 +605,26 @@ const (
 	emergencysev
 )
 
-func (s severity) String() string {
+func (s severity) MarshalJSON() ([]byte, error) {
 	switch s {
 	default:
-		return ""
+		return []byte(`"UNKNOWN"`), fmt.Errorf("unknown severity: %d", s)
 	case debugsev:
-		return "DEBUG"
+		return []byte(`"DEBUG"`), nil
 	case infosev:
-		return "INFO"
+		return []byte(`"INFO"`), nil
 	case noticesev:
-		return "NOTICE"
+		return []byte(`"NOTICE"`), nil
 	case warningsev:
-		return "WARNING"
+		return []byte(`"WARNING"`), nil
 	case errorsev:
-		return "ERROR"
+		return []byte(`"ERROR"`), nil
 	case criticalsev:
-		return "CRITICAL"
+		return []byte(`"CRITICAL"`), nil
 	case alertsev:
-		return "ALERT"
+		return []byte(`"ALERT"`), nil
 	case emergencysev:
-		return "EMERGENCY"
+		return []byte(`"EMERGENCY"`), nil
 	}
 }
 
@@ -646,13 +646,13 @@ func logf(s severity, l *Logger, format string, v ...interface{}) string {
 }
 
 type entry struct {
-	Message  string `json:"message"`
-	Severity string `json:"severity,omitempty"`
-	Trace    string `json:"logging.googleapis.com/trace,omitempty"`
+	Message  string   `json:"message"`
+	Severity severity `json:"severity,omitempty"`
+	Trace    string   `json:"logging.googleapis.com/trace,omitempty"`
 }
 
 func logs(s severity, l *Logger, msg string) string {
-	entry := entry{msg, s.String(), l.trace}
+	entry := entry{msg, s, l.trace}
 
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -706,14 +706,6 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 		}
 	}
 
-	sev := s.String()
-	if sev != "" {
-		sevj, err = json.Marshal(sev)
-		if err != nil {
-			return
-		}
-	}
-
 	if l.trace != "" {
 		tracej, err = json.Marshal(l.trace)
 		if err != nil {
@@ -749,7 +741,8 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 		comma = []byte(",")
 	}
 
-	if sev != "" {
+	sevj, err = s.MarshalJSON()
+	if err == nil {
 		if _, err := w.Write(comma); err != nil {
 			return
 		}
@@ -805,4 +798,3 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 		_, _ = w.Write([]byte("\n"))
 	}
 }
-
