@@ -10,6 +10,7 @@
 package log
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -547,7 +548,7 @@ type Logger struct {
 	out   io.Writer
 	err   io.Writer
 	mu    sync.Mutex
-	trace string
+	trace json.RawMessage
 }
 
 // ForRequest creates a new Logger. All the messages logged through it will trace
@@ -575,7 +576,11 @@ func ForRequest(request *http.Request) *Logger {
 			}
 
 			if strings.Count(t, "0") != len(t) {
-				l.trace = fmt.Sprintf("projects/%s/traces/%s", ProjectID, t)
+				b, err := marshalJSON(fmt.Sprintf("projects/%s/traces/%s", ProjectID, t))
+				if err != nil {
+					return l
+				}
+				l.trace = b
 			}
 		}
 	}
@@ -665,9 +670,9 @@ func logf(s severity, l *Logger, format string, v ...interface{}) string {
 }
 
 type entry struct {
-	Message  string   `json:"message"`
-	Severity severity `json:"severity,omitempty"`
-	Trace    string   `json:"logging.googleapis.com/trace,omitempty"`
+	Message  string          `json:"message"`
+	Severity severity        `json:"severity,omitempty"`
+	Trace    json.RawMessage `json:"logging.googleapis.com/trace,omitempty"`
 }
 
 func logs(s severity, l *Logger, msg string) string {
@@ -706,6 +711,22 @@ func logj(s severity, l *Logger, msg string, j interface{}) {
 	logRawJSON(s, l, msg, buf)
 }
 
+// marshalJSON is exactly like json.Marshal except it uses option SetEscapeHTML(false)
+// in order to not to mange the output and that it pre-allocates the buffer at 1024 bytes.
+func marshalJSON(in interface{}) ([]byte, error) {
+	buf := bytes.NewBuffer(make([]byte, 0, 1024))
+	encoder := json.NewEncoder(buf)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(in)
+	if err != nil {
+		return nil, err
+	}
+
+	// Remove the final new line.
+	res := bytes.TrimRight(buf.Bytes(), "\n")
+	return res, err
+}
+
 // logRawJSON writes the buf to the l logger. The buf should be
 // an encoded JSON and its first byte must be '{'.
 // The s and msg are brutally inserted as "severity" and "message" top-level JSON fields.
@@ -715,18 +736,11 @@ func logj(s severity, l *Logger, msg string, j interface{}) {
 // duplicated and whether it is a valid JSON. Spoiler alert: GCP Logging API seems to be
 // quite gracefully handling malformed JSON entries with such duplicate fields.
 func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
-	var msgj, sevj, tracej []byte
+	var msgj, sevj []byte
 	var err error
 
 	if msg != "" {
 		msgj, err = json.Marshal(msg)
-		if err != nil {
-			return
-		}
-	}
-
-	if l.trace != "" {
-		tracej, err = json.Marshal(l.trace)
 		if err != nil {
 			return
 		}
@@ -775,14 +789,14 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 		comma = []byte(",")
 	}
 
-	if l.trace != "" {
+	if len(l.trace) != 0 {
 		if _, err := w.Write(comma); err != nil {
 			return
 		}
 		if _, err := w.Write([]byte("\"logging.googleapis.com/trace\":")); err != nil {
 			return
 		}
-		if _, err := w.Write(tracej); err != nil {
+		if _, err := w.Write(l.trace); err != nil {
 			return
 		}
 

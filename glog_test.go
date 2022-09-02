@@ -36,7 +36,7 @@ func TestLogger_Debugj(t *testing.T) {
 	type fields struct {
 		out   io.Writer
 		err   io.Writer
-		trace string
+		trace []byte
 	}
 
 	type args struct {
@@ -52,8 +52,23 @@ func TestLogger_Debugj(t *testing.T) {
 	}{{
 		name:   "easy struct",
 		fields: fields{out: buf},
-		args:   args{"test", struct{ Text string }{Text: "t"}},
+		args: args{
+			msg: "test",
+			v:   struct{ Text string }{Text: "t"},
+		},
 		want: `{"message":"test","severity":"DEBUG","Text":"t"}
+`,
+	}, {
+		name: "tracing the numeral",
+		fields: fields{
+			out:   buf,
+			trace: []byte(`"123"`),
+		},
+		args: args{
+			msg: "test",
+			v:   struct{ Text string }{Text: "t"},
+		},
+		want: `{"message":"test","severity":"DEBUG","logging.googleapis.com/trace":"123","Text":"t"}
 `,
 	}, {
 		name:   "empty struct",
@@ -420,8 +435,8 @@ func logjStdlib(s severity, l *Logger, msg string, j interface{}) {
 	if v := msg; v != "" {
 		entry["message"], _ = json.Marshal(v)
 	}
-	if v := l.trace; v != "" {
-		entry["logging.googleapis.com/trace"], _ = json.Marshal(v)
+	if v := l.trace; len(v) != 0 {
+		entry["logging.googleapis.com/trace"] = v
 	}
 	entry["severity"], _ = s.MarshalJSON()
 
@@ -462,7 +477,7 @@ func TestForRequest(t *testing.T) {
 			"X-Cloud-Trace-Context": []string{"00000000000000000000000000000001/1;o=1"},
 		}}},
 		want: &Logger{
-			trace: "projects/my-project/traces/00000000000000000000000000000001",
+			trace: []byte(`"projects/my-project/traces/00000000000000000000000000000001"`),
 		},
 	}, {
 		name:      "tracing header without the o option",
@@ -471,7 +486,7 @@ func TestForRequest(t *testing.T) {
 			"X-Cloud-Trace-Context": []string{"00000000000000000000000000000001/1"},
 		}}},
 		want: &Logger{
-			trace: "projects/my-project/traces/00000000000000000000000000000001",
+			trace: []byte(`"projects/my-project/traces/00000000000000000000000000000001"`),
 		},
 	}, {
 		name:      "o=0 header disables tracing",
