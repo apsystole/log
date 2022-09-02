@@ -1,11 +1,11 @@
 package log
 
-// Test the public interface, but inject some private dependencies; run it from the same package.
-
 import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"net/http"
+	"reflect"
 	"testing"
 )
 
@@ -428,4 +428,83 @@ func logjStdlib(s severity, l *Logger, msg string, j interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	_ = json.NewEncoder(l.writer(s)).Encode(entry)
+}
+
+func TestForRequest(t *testing.T) {
+	type args struct {
+		req *http.Request
+	}
+	tests := []struct {
+		name      string
+		projectID string
+		args      args
+		want      *Logger
+	}{{
+		name: "no tracing header",
+		args: args{req: &http.Request{Header: http.Header{}}},
+		want: &Logger{},
+	}, {
+		name: "empty tracing header",
+		args: args{req: &http.Request{Header: http.Header{
+			"X-Cloud-Trace-Context": []string{""},
+		}}},
+		want: &Logger{},
+	}, {
+		name: "tracing header without project",
+		args: args{req: &http.Request{Header: http.Header{
+			"X-Cloud-Trace-Context": []string{"00000000000000000000000000000001/1;"},
+		}}},
+		want: &Logger{},
+	}, {
+		name:      "basic tracing",
+		projectID: "my-project",
+		args: args{req: &http.Request{Header: http.Header{
+			"X-Cloud-Trace-Context": []string{"00000000000000000000000000000001/1;o=1"},
+		}}},
+		want: &Logger{
+			trace: "projects/my-project/traces/00000000000000000000000000000001",
+		},
+	}, {
+		name:      "tracing header without the o option",
+		projectID: "my-project",
+		args: args{req: &http.Request{Header: http.Header{
+			"X-Cloud-Trace-Context": []string{"00000000000000000000000000000001/1"},
+		}}},
+		want: &Logger{
+			trace: "projects/my-project/traces/00000000000000000000000000000001",
+		},
+	}, {
+		name:      "o=0 header disables tracing",
+		projectID: "my-project",
+		args: args{req: &http.Request{Header: http.Header{
+			"X-Cloud-Trace-Context": []string{"00000000000000000000000000000001/1;o=0"},
+		}}},
+		want: &Logger{},
+	}, {
+		name:      "bad header no tid",
+		projectID: "my-project",
+		args: args{req: &http.Request{Header: http.Header{
+			"X-Cloud-Trace-Context": []string{"/123;o=1"},
+		}}},
+		want: &Logger{},
+	}, {
+		name:      "bad header malformed tid",
+		projectID: "my-project",
+		args: args{req: &http.Request{Header: http.Header{
+			"X-Cloud-Trace-Context": []string{"&/123;o=1"},
+		}}},
+		want: &Logger{},
+	}}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			ProjectID = tt.projectID
+
+			got := ForRequest(tt.args.req)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ForRequest() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

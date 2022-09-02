@@ -560,8 +560,21 @@ func ForRequest(request *http.Request) *Logger {
 
 	if ProjectID != "" {
 		h := request.Header.Get("X-Cloud-Trace-Context")
-		if i := strings.IndexByte(h, '/'); i > 0 {
-			if t := h[:i]; strings.Count(t, "0") != len(t) {
+		// "X-Cloud-Trace-Context: TRACE_ID/SPAN_ID;o=TRACE_TRUE" meaning:
+		// TRACE_ID is a 32-character hexadecimal value representing a 128-bit number. [Future-proofing to 256-char.]
+		// SPAN_ID is the decimal representation of [unsigned integer of unspecified bitlength].
+		// TRACE_TRUE must be `1` to trace this request. Specify `0` to not trace the request.
+		if i := strings.IndexByte(h, '/'); i > 0 && i <= 256 {
+			if strings.Contains(h[i:], ";o=0") {
+				return l
+			}
+
+			t := h[:i]
+			if strings.TrimLeft(t, "0123456789abcdefABCDEFxX") != "" {
+				return l
+			}
+
+			if strings.Count(t, "0") != len(t) {
 				l.trace = fmt.Sprintf("projects/%s/traces/%s", ProjectID, t)
 			}
 		}
