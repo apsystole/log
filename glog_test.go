@@ -30,6 +30,64 @@ func TestPanic(t *testing.T) {
 	l.Panic("a")
 }
 
+func TestLogger_Print(t *testing.T) {
+	type fields struct {
+		trace []byte
+	}
+
+	tests := []struct {
+		name   string
+		fields fields
+		arg    string
+		want   string
+	}{{
+		name: "empty message",
+		arg:  "",
+		want: `{"message":"","severity":"INFO"}
+`,
+	}, {
+		name: "ending newline",
+		arg:  "test\n",
+		want: `{"message":"test\n","severity":"INFO"}
+`,
+	}, {
+		name: "non-ending newline",
+		arg:  "line\ntest",
+		want: `{"message":"line\ntest","severity":"INFO"}
+`,
+	}, {
+		name: "ampersand",
+		arg:  "m&m",
+		want: `{"message":"m&m","severity":"INFO"}
+`,
+	}}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			// AAA: Arrange
+			buf := &bytes.Buffer{}
+
+			l := &Logger{
+				out:   buf,
+				err:   nil,
+				trace: tt.fields.trace,
+			}
+
+			// AAA: Act
+			l.Print(tt.arg)
+
+			// AAA: Assert
+			if tt.want != buf.String() {
+				t.Errorf("unexpected output, got:\n%q\nexpected:\n%q\n", buf.String(), tt.want)
+			}
+			if !json.Valid(buf.Bytes()) {
+				t.Errorf("output is not a valid JSON:\n%q\n", buf.Bytes())
+			}
+		})
+	}
+}
+
 func TestLogger_Debugj(t *testing.T) {
 	buf := &bytes.Buffer{}
 
@@ -73,8 +131,37 @@ func TestLogger_Debugj(t *testing.T) {
 	}, {
 		name:   "empty struct",
 		fields: fields{out: buf},
-		args:   args{"test", struct{}{}},
+		args: args{
+			msg: "test",
+			v:   struct{}{},
+		},
 		want: `{"message":"test","severity":"DEBUG"}
+`,
+	}, {
+		name:   "ampersand in a key",
+		fields: fields{out: buf},
+		args: args{
+			msg: "test",
+			v: struct {
+				MandM string `json:"m&m"`
+			}{
+				MandM: "not brown",
+			},
+		},
+		want: `{"message":"test","severity":"DEBUG","m&m":"not brown"}
+`,
+	}, {
+		name:   "ampersand in a string value",
+		fields: fields{out: buf},
+		args: args{
+			msg: "test",
+			v: struct {
+				MandM string
+			}{
+				MandM: "brown&banned",
+			},
+		},
+		want: `{"message":"test","severity":"DEBUG","MandM":"brown&banned"}
 `,
 	}}
 
@@ -99,7 +186,7 @@ func TestLogger_Debugj(t *testing.T) {
 }
 
 func BenchmarkDebugf(b *testing.B) {
-	buf := &bytes.Buffer{} // quite unrealistic, as a write to file here is about 14 000 ns
+	buf := &bytes.Buffer{} // quite unrealistic, as a write to file here is about 10_000 ns
 	l := New(buf, "", 0)
 	for i := 0; i < b.N; i++ {
 		l.Debugf("%q", "test")

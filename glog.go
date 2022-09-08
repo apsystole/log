@@ -678,18 +678,21 @@ type entry struct {
 func logs(s severity, l *Logger, msg string) string {
 	entry := entry{msg, s, l.trace}
 
+	encoder := json.NewEncoder(l.writer(s))
+	encoder.SetEscapeHTML(false)
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	_ = json.NewEncoder(l.writer(s)).Encode(entry)
+	_ = encoder.Encode(entry)
 
 	return msg
 }
 
-func logj(s severity, l *Logger, msg string, j interface{}) {
-	if j == nil {
+func logj(s severity, l *Logger, msg string, item interface{}) {
+	if item == nil {
 		log(s, l, msg)
 		return
 	}
+
 	// TODO maybe use reflect to catch things like map[string]string, but it'd be
 	// best effort only.
 	// This allows to check for duplicate fields, e.g. "message", if a user throws
@@ -701,7 +704,7 @@ func logj(s severity, l *Logger, msg string, j interface{}) {
 	// 	if _, ok := v["message"]; ok {
 	// 	}
 	// }
-	buf, err := json.Marshal(j)
+	buf, err := marshalJSON(item)
 	if err != nil {
 		// Ignore. This is just logging. Do not panic the entire app
 		// just because the caller had botched their x.Marshal(), etc.
@@ -740,7 +743,7 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 	var err error
 
 	if msg != "" {
-		msgj, err = json.Marshal(msg)
+		msgj, err = marshalJSON(msg)
 		if err != nil {
 			return
 		}
@@ -818,7 +821,7 @@ func logRawJSON(s severity, l *Logger, msg string, buf []byte) {
 		return
 	}
 
-	if len(buf) > 1 {
+	if len(buf) > 0 && buf[0] != '}' {
 		if _, err := w.Write(comma); err != nil {
 			return
 		}
