@@ -70,7 +70,7 @@ func Infof(format string, v ...interface{}) {
 }
 
 // Infoj logs routine information, such as ongoing status or performance.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func Infoj(msg string, v interface{}) {
 	std.Infoj(msg, v)
 }
@@ -94,7 +94,7 @@ func Noticef(format string, v ...interface{}) {
 }
 
 // Noticej logs normal but significant events, such as start up, shut down, or configuration.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func Noticej(msg string, v interface{}) {
 	std.Noticej(msg, v)
 }
@@ -118,7 +118,7 @@ func Warningf(format string, v ...interface{}) {
 }
 
 // Warningj logs events that might cause problems.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func Warningj(msg string, v interface{}) {
 	std.Warningj(msg, v)
 }
@@ -142,7 +142,7 @@ func Errorf(format string, v ...interface{}) {
 }
 
 // Errorj logs events likely to cause problems.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func Errorj(msg string, v interface{}) {
 	std.Errorj(msg, v)
 }
@@ -166,7 +166,7 @@ func Criticalf(format string, v ...interface{}) {
 }
 
 // Criticalj logs events that cause more severe problems or outages.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func Criticalj(msg string, v interface{}) {
 	std.Criticalj(msg, v)
 }
@@ -190,7 +190,7 @@ func Printf(format string, v ...interface{}) {
 }
 
 // Printj logs routine information, such as ongoing status or performance, same as Infoj().
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func Printj(msg string, v interface{}) {
 	std.Printj(msg, v)
 }
@@ -254,7 +254,7 @@ func Alertf(format string, v ...interface{}) {
 }
 
 // Alertj logs when a person must take an action immediately.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func Alertj(msg string, v interface{}) {
 	std.Alertj(msg, v)
 }
@@ -278,7 +278,7 @@ func Emergencyf(format string, v ...interface{}) {
 }
 
 // Emergencyj logs when one or more systems are unusable.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func Emergencyj(msg string, v interface{}) {
 	std.Emergencyj(msg, v)
 }
@@ -326,7 +326,7 @@ func (l *Logger) Infof(format string, v ...interface{}) {
 }
 
 // Infoj logs routine information, such as ongoing status or performance.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func (l *Logger) Infoj(msg string, v interface{}) {
 	logj(infosev, l, msg, v)
 }
@@ -350,7 +350,7 @@ func (l *Logger) Noticef(format string, v ...interface{}) {
 }
 
 // Noticej logs normal but significant events, such as start up, shut down, or configuration.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func (l *Logger) Noticej(msg string, v interface{}) {
 	logj(noticesev, l, msg, v)
 }
@@ -374,7 +374,7 @@ func (l *Logger) Warningf(format string, v ...interface{}) {
 }
 
 // Warningj logs events that might cause problems.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func (l *Logger) Warningj(msg string, v interface{}) {
 	logj(warningsev, l, msg, v)
 }
@@ -398,7 +398,7 @@ func (l *Logger) Errorf(format string, v ...interface{}) {
 }
 
 // Errorj logs events likely to cause problems.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func (l *Logger) Errorj(msg string, v interface{}) {
 	logj(errorsev, l, msg, v)
 }
@@ -422,7 +422,7 @@ func (l *Logger) Criticalf(format string, v ...interface{}) {
 }
 
 // Criticalj logs events that cause more severe problems or outages.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func (l *Logger) Criticalj(msg string, v interface{}) {
 	logj(criticalsev, l, msg, v)
 }
@@ -446,7 +446,7 @@ func (l *Logger) Alertf(format string, v ...interface{}) {
 }
 
 // Alertj logs when a person must take an action immediately.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func (l *Logger) Alertj(msg string, v interface{}) {
 	logj(alertsev, l, msg, v)
 }
@@ -470,7 +470,7 @@ func (l *Logger) Emergencyf(format string, v ...interface{}) {
 }
 
 // Emergencyj logs when one or more systems are unusable.
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func (l *Logger) Emergencyj(msg string, v interface{}) {
 	logj(emergencysev, l, msg, v)
 }
@@ -494,7 +494,7 @@ func (l *Logger) Printf(format string, v ...interface{}) {
 }
 
 // Printj logs routine information, such as ongoing status or performance, same as l.Infoj().
-// Arguments become jsonPayload in the log entry.
+// Argument v becomes the jsonPayload field of the log entry.
 func (l *Logger) Printj(msg string, v interface{}) {
 	logj(infosev, l, msg, v)
 }
