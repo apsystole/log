@@ -688,26 +688,23 @@ func logs(s severity, l *Logger, msg string) string {
 }
 
 func logj(s severity, l *Logger, msg string, item interface{}) {
-	if item == nil {
-		log(s, l, msg)
-		return
-	}
-
-	// TODO maybe use reflect to catch things like map[string]string, but it'd be
-	// best effort only.
-	// This allows to check for duplicate fields, e.g. "message", if a user throws
-	// at us a map which they don't bother to sanitize.
+	// Would be nice to check for duplicated fields, e.g. "message", if a user throws at us a map which they don't
+	// bother to sanitize.
 	//
-	// This is a dead end, it doesn't catch map[string]string:
+	// This code would be a dead end, as it doesn't catch map[string]string:
 	// switch v := j.(type) {
 	// case map[string]interface{}:
 	// 	if _, ok := v["message"]; ok {
 	// 	}
 	// }
+	//
+	// It could maybe use reflect to catch things like map[string]string, but it'd be slow and hard to do exhaustively.
 	buf, err := marshalJSON(item)
 	if err != nil {
-		// Ignore. This is just logging. Do not panic the entire app
-		// just because the caller had botched their x.Marshal(), etc.
+		// Do not include the err: do not risk infinite loop when err itself has a custom marshaler that returns
+		// the same error.
+		logRawJSON(s, l, msg, []byte(`{"logLibMsg":"cannot marshal the argument as jsonPayload"}`))
+
 		return
 	}
 

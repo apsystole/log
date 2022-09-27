@@ -3,15 +3,17 @@ package log
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"reflect"
 	"testing"
 )
 
-func TestPanic(t *testing.T) {
+func TestLogger_Panic(t *testing.T) {
 	// Arrange
-	wantJSON := "{\"message\":\"a\",\"severity\":\"CRITICAL\"}\n"
+	wantJSON := `{"message":"a","severity":"CRITICAL"}
+`
 	wantPanic := "a"
 	buf := &bytes.Buffer{}
 	l := New(buf, "", 0)
@@ -138,6 +140,24 @@ func TestLogger_Debugj(t *testing.T) {
 		want: `{"message":"test","severity":"DEBUG"}
 `,
 	}, {
+		name:   "typed nil",
+		fields: fields{out: buf},
+		args: args{
+			msg: "test",
+			v:   (*string)(nil),
+		},
+		want: `{"message":"test","severity":"DEBUG","value":null}
+`,
+	}, {
+		name:   "untyped nil",
+		fields: fields{out: buf},
+		args: args{
+			msg: "test",
+			v:   nil,
+		},
+		want: `{"message":"test","severity":"DEBUG","value":null}
+`,
+	}, {
 		name:   "ampersand in a key",
 		fields: fields{out: buf},
 		args: args{
@@ -183,6 +203,53 @@ func TestLogger_Debugj(t *testing.T) {
 			buf.Reset()
 		})
 	}
+}
+
+// failingType fakes an error every time it's marshaled as JSON.
+type failingType int
+
+func (t failingType) MarshalJSON() ([]byte, error) {
+	return nil, errors.New("e")
+}
+
+func TestPrintj_FailingMarshaler(t *testing.T) {
+	// Arrange
+	wantJSON := `{"message":"a","severity":"INFO","logLibMsg":"cannot marshal the argument as jsonPayload"}
+`
+	buf := &bytes.Buffer{}
+	l := New(buf, "", 0)
+	var ft failingType
+
+	// Act
+	l.Printj("a", ft)
+
+	// Assert
+	if wantJSON != buf.String() {
+		t.Errorf("unexpected output, got:\n%q\nexpected:\n%q\n", buf.String(), wantJSON)
+	}
+}
+
+// panickingType fakes a panic every time it's marshaled as JSON.
+type panickingType int
+
+func (t panickingType) MarshalJSON() ([]byte, error) {
+	panic("p")
+}
+
+func TestPrintj_PanickingMarshaler(t *testing.T) {
+	// Arrange
+	wantPanic := "p"
+	var pt panickingType
+
+	// Assert
+	defer func() {
+		if gotPanic := recover(); gotPanic != wantPanic {
+			t.Errorf("unexpected panic, got:\n%q\nexpected:\n%q\n", gotPanic, wantPanic)
+		}
+	}()
+
+	// Act
+	Printj("a", pt)
 }
 
 func BenchmarkDebugf(b *testing.B) {
