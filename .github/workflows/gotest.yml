@@ -8,7 +8,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.9.4
+          go-version: "1.9.4"
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Hack for ancient mod-incompatible Go versions
@@ -21,7 +21,7 @@ jobs:
     name: Tests on GCP's exact versions per https://cloud.google.com/functions/docs/concepts/go-runtime
     strategy:
       matrix:
-        go-version: [1.11.6, 1.13.15, 1.16.7]
+        go-version: ["1.11.6", "1.13.15", "1.16.7"]
         os: [ubuntu-18.04]
     runs-on: ${{ matrix.os }}
     steps:
@@ -37,7 +37,7 @@ jobs:
     name: Tests on GCP's exact versions per https://cloud.google.com/functions/docs/concepts/go-runtime
     strategy:
       matrix:
-        go-version: [1.18, 1.19, 1.20]
+        go-version: ["1.18", "1.19", "1.20"]
         os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     steps:
@@ -53,7 +53,7 @@ jobs:
     name: Test the latest Go on the latest OSes
     strategy:
       matrix:
-        go-version: [1.x]
+        go-version: ["1.x"]
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
