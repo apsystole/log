@@ -3,7 +3,7 @@ name: Go test
 jobs:
   oldest:
     name: The oldest possible Go version whatever hacks needed
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Install Go
         uses: actions/setup-go@v4
