@@ -10,7 +10,7 @@ jobs:
         with:
           go-version: "1.9.4"
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Hack for ancient mod-incompatible Go versions
         run: mkdir -p /home/runner/go/src/github.com/apsystole && cp -pr . /home/runner/go/src/github.com/apsystole/log
       - name: Find
@@ -30,7 +30,7 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test
         run: go test ./...
   gcp_cloud_functions_exact_ubuntu22:
@@ -46,7 +46,7 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test
         run: go test ./...
   latest:
@@ -62,6 +62,6 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Test
         run: go test ./...
