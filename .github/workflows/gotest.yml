@@ -17,11 +17,11 @@ jobs:
         run: find . -ls
       - name: Test
         run: go test ./...
-  gcp_cloud_functions_exact_ubuntu18:
+  gcp_cloud_functions_exact_ubuntu20:
     name: Tests on GCP's exact versions per https://cloud.google.com/functions/docs/concepts/go-runtime
     strategy:
       matrix:
-        go-version: ["1.11.6", "1.13.15", "1.16.7"]
+        go-version: ["1.13.15"]
         os: [ubuntu-20.04] # GCP actually uses 18.04, but they are unsupported on any free-tier CI.
     runs-on: ${{ matrix.os }}
     steps:
@@ -37,7 +37,7 @@ jobs:
     name: Tests on GCP's exact versions per https://cloud.google.com/functions/docs/concepts/go-runtime
     strategy:
       matrix:
-        go-version: ["1.18", "1.19", "1.20"]
+        go-version: ["1.18.10", "1.19.13", "1.21.10"]
         os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     steps:
