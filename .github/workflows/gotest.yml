@@ -8,7 +8,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.9.4"
+          go-version: "1.24.1"
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Hack for ancient mod-incompatible Go versions
