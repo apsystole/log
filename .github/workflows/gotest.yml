@@ -8,7 +8,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24.1"
+          go-version: '1.9.4' # do not bump unless it disappears
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Hack for ancient mod-incompatible Go versions
@@ -17,28 +17,12 @@ jobs:
         run: find . -ls
       - name: Test
         run: go test ./...
-  gcp_cloud_functions_exact_ubuntu20:
-    name: Tests on GCP's exact versions per https://cloud.google.com/functions/docs/concepts/go-runtime
-    strategy:
-      matrix:
-        go-version: ["1.13.15"]
-        os: [ubuntu-20.04] # GCP actually uses 18.04, but they are unsupported on any free-tier CI.
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ matrix.go-version }}
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Test
-        run: go test ./...
   gcp_cloud_functions_exact_ubuntu22:
-    name: Tests on GCP's exact versions per https://cloud.google.com/functions/docs/concepts/go-runtime
+    name: Test on the hand-picked older GCP's exact Go versions per https://cloud.google.com/functions/docs/concepts/go-runtime
     strategy:
       matrix:
-        go-version: ["1.18.10", "1.19.13", "1.21.10"]
-        os: [ubuntu-22.04]
+        go-version: ['1.13.15', '1.16.15', '1.18.10', '1.19.13']
+        os: [ubuntu-22.04] # unlikely that any CI platform supports such ancient Ubuntu as GCP
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Go
@@ -53,7 +37,7 @@ jobs:
     name: Test the latest Go on the latest OSes
     strategy:
       matrix:
-        go-version: ["1.x"]
+        go-version: ['1.x']
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
