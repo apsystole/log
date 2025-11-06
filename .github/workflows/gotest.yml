@@ -8,7 +8,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v6
         with:
-          go-version: '1.9.4' # do not bump unless it disappears
+          go-version: '1.25.4' # do not bump unless it disappears
       - name: Checkout code
         uses: actions/checkout@v5
       - name: Hack for ancient mod-incompatible Go versions
